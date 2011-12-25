@@ -20,6 +20,7 @@ function! edit_archive#archive#Common(name)
         \ 'FileList': function('edit_archive#archive#FileList'),
         \ 'Extract':  function('edit_archive#archive#Extract'),
         \ 'Update':   function('edit_archive#archive#Update'),
+        \ 'Rename':   function('edit_archive#archive#Rename'),
         \
         \ 'GotoBuffer':          function('edit_archive#archive#GotoBuffer'),
         \ 'ExtractAll':          function('edit_archive#archive#ExtractAll'),
@@ -39,6 +40,17 @@ endfunction
 
 function! edit_archive#archive#Update(...) dict
   throw 'not implemented'
+endfunction
+
+function! edit_archive#archive#Rename(old_name, new_name) dict
+  let tempfile = self.Tempname(a:old_name)
+  call system('zip -r '.self.name.' -d '.a:old_name)
+
+  let cwd = getcwd()
+  exe 'cd '.self._tempdir
+  call rename(a:old_name, a:new_name)
+  call system('zip -r '.self.name.' '.a:new_name)
+  exe 'cd '.cwd
 endfunction
 
 function! edit_archive#archive#GotoBuffer() dict
