@@ -14,9 +14,9 @@ function! edit_archive#archive#Common(name)
         \ 'readonly': 0,
         \ '_tempdir': '',
         \
-        \ 'FileList':   function('edit_archive#archive#FileList'),
-        \ 'Extract':    function('edit_archive#archive#Extract'),
-        \ 'UpdateFile': function('edit_archive#archive#UpdateFile'),
+        \ 'FileList': function('edit_archive#archive#FileList'),
+        \ 'Extract':  function('edit_archive#archive#Extract'),
+        \ 'Update':   function('edit_archive#archive#Update'),
         \
         \ 'ExtractAll':          function('edit_archive#archive#ExtractAll'),
         \ 'Tempname':            function('edit_archive#archive#Tempname'),
@@ -29,11 +29,11 @@ function! edit_archive#archive#FileList() dict
   throw "not implemented"
 endfunction
 
-function! edit_archive#archive#Extract(filename) dict
+function! edit_archive#archive#Extract(...) dict
   throw "not implemented"
 endfunction
 
-function! edit_archive#archive#UpdateFile(filename) dict
+function! edit_archive#archive#Update(...) dict
   throw "not implemented"
 endfunction
 
@@ -63,7 +63,7 @@ function! edit_archive#archive#UpdateArchive(filename) dict
 
   let cwd = getcwd()
   exe 'cd '.self._tempdir
-  call self.UpdateFile(archive_filename)
+  call self.Update(archive_filename)
   exe 'cd '.cwd
 endfunction
 

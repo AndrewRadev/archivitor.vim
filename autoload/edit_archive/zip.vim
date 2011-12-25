@@ -18,6 +18,7 @@ function! edit_archive#zip#Extract(...) dict
   call system('unzip '.self.name.' '.files)
 endfunction
 
-function! edit_archive#archive#UpdateFile(filename) dict
-  call system('zip -u '.self.name.' '.a:filename)
+function! edit_archive#archive#Update(...) dict
+  let files = join(a:000, ' ')
+  call system('zip -u '.self.name.' '.files)
 endfunction

@@ -16,6 +16,6 @@ function! edit_archive#rar#Extract(...) dict
   call system('unrar x '.self.name.' '.files)
 endfunction
 
-function! edit_archive#archive#UpdateFile(filename) dict
+function! edit_archive#archive#Update(...) dict
   throw "RAR files are read-only"
 endfunction
