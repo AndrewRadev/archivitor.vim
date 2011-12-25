@@ -17,9 +17,10 @@ function! s:ReadArchive(archive)
   normal! gg
   set readonly
   set filetype=archive
+  set hidden
 
   nnoremap <buffer> <cr> :call <SID>EditFile()<cr>
-  command! -nargs=1 -complete=dir Extract call b:archive.ExtractAll(<f-args>)
+  command! -buffer -nargs=1 -complete=dir Extract call b:archive.ExtractAll(<f-args>)
 endfunction
 
 function! s:EditFile()
@@ -30,4 +31,5 @@ function! s:EditFile()
   exe 'edit '.tempname
   let b:archive = archive
   call b:archive.SetupWriteBehaviour(filename)
+  command! -buffer Archive call b:archive.GotoBuffer()
 endfunction

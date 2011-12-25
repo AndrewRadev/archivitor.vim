@@ -15,11 +15,13 @@ function! edit_archive#archive#Common(name)
         \ 'size':     s:Filesize(a:name),
         \ 'readonly': 0,
         \ '_tempdir': '',
+        \ '_bufnr':   bufnr('%'),
         \
         \ 'FileList': function('edit_archive#archive#FileList'),
         \ 'Extract':  function('edit_archive#archive#Extract'),
         \ 'Update':   function('edit_archive#archive#Update'),
         \
+        \ 'GotoBuffer':          function('edit_archive#archive#GotoBuffer'),
         \ 'ExtractAll':          function('edit_archive#archive#ExtractAll'),
         \ 'Tempname':            function('edit_archive#archive#Tempname'),
         \ 'SetupWriteBehaviour': function('edit_archive#archive#SetupWriteBehaviour'),
@@ -28,15 +30,19 @@ function! edit_archive#archive#Common(name)
 endfunction
 
 function! edit_archive#archive#FileList() dict
-  throw "not implemented"
+  throw 'not implemented'
 endfunction
 
 function! edit_archive#archive#Extract(...) dict
-  throw "not implemented"
+  throw 'not implemented'
 endfunction
 
 function! edit_archive#archive#Update(...) dict
-  throw "not implemented"
+  throw 'not implemented'
+endfunction
+
+function! edit_archive#archive#GotoBuffer() dict
+  exe 'buffer '.self._bufnr
 endfunction
 
 function! edit_archive#archive#ExtractAll(dir) dict
