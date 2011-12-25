@@ -2,8 +2,8 @@ function! edit_archive#rar#New(name)
   return extend(edit_archive#archive#Common(a:name), {
         \ 'readonly': 1,
         \
-        \ 'FileList':    function('edit_archive#rar#FileList'),
-        \ 'ExtractFile': function('edit_archive#rar#ExtractFile'),
+        \ 'FileList': function('edit_archive#rar#FileList'),
+        \ 'Extract':  function('edit_archive#rar#Extract'),
         \ })
 endfunction
 
@@ -11,10 +11,11 @@ function! edit_archive#rar#FileList() dict
   return sort(split(system('unrar vb ' . self.name), "\n"))
 endfunction
 
-function! edit_archive#rar#ExtractFile(filename) dict
-  call system('unrar x '.self.name.' '.a:filename)
+function! edit_archive#rar#Extract(...) dict
+  let files = join(a:000, ' ')
+  call system('unrar x '.self.name.' '.files)
 endfunction
 
-function! edit_archive#archive#UpdateFile(archive_filename, real_filename) dict
+function! edit_archive#archive#UpdateFile(filename) dict
   throw "RAR files are read-only"
 endfunction

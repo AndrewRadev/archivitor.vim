@@ -1,7 +1,7 @@
 function! edit_archive#zip#New(name)
   return extend(edit_archive#archive#Common(a:name), {
-        \ 'FileList':    function('edit_archive#zip#FileList'),
-        \ 'ExtractFile': function('edit_archive#zip#ExtractFile'),
+        \ 'FileList': function('edit_archive#zip#FileList'),
+        \ 'Extract':  function('edit_archive#zip#Extract'),
         \ })
 endfunction
 
@@ -13,8 +13,9 @@ function! edit_archive#zip#FileList() dict
   return sort(file_list)
 endfunction
 
-function! edit_archive#zip#ExtractFile(filename) dict
-  call system('unzip '.self.name.' '.a:filename)
+function! edit_archive#zip#Extract(...) dict
+  let files = join(a:000, ' ')
+  call system('unzip '.self.name.' '.files)
 endfunction
 
 function! edit_archive#archive#UpdateFile(filename) dict

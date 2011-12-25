@@ -15,6 +15,7 @@ function! s:ReadArchive(archive)
   set readonly
 
   nnoremap <buffer> <cr> :call <SID>EditFile()<cr>
+  command! -nargs=1 -complete=dir Extract call b:archive.ExtractAll(<f-args>)
 endfunction
 
 function! s:EditFile()
