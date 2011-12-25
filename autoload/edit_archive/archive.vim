@@ -11,6 +11,8 @@ endfunction
 function! edit_archive#archive#Common(name)
   return {
         \ 'name':     fnamemodify(a:name, ':p'),
+        \ 'format':   fnamemodify(a:name, ':e'),
+        \ 'size':     s:Filesize(a:name),
         \ 'readonly': 0,
         \ '_tempdir': '',
         \
@@ -79,4 +81,20 @@ function! edit_archive#archive#Tempname(filename) dict
   exe 'cd '.cwd
 
   return self._tempdir.'/'.a:filename
+endfunction
+
+function! s:Filesize(filename)
+  let bytes = getfsize(a:filename)
+
+  if bytes >= 1024 * 1024
+    let size = string(bytes / (1024.0 * 1024.0)) . 'MB'
+  elseif bytes >= 1024
+    let size = string(bytes / 1024.0) . 'KB'
+  else
+    let size = string(bytes).'B'
+  endif
+
+  let size = substitute(size, '\.\d\d\zs\d\+\ze\w', '', '')
+
+  return size
 endfunction
