@@ -21,7 +21,9 @@ function! edit_archive#archive#New(name)
         \ '_bufnr':   bufnr('%'),
         \
         \ 'Filelist':            function('edit_archive#archive#Filelist'),
+        \ 'Add':                 function('edit_archive#archive#Add'),
         \ 'Rename':              function('edit_archive#archive#Rename'),
+        \ 'Delete':              function('edit_archive#archive#Delete'),
         \ 'GotoBuffer':          function('edit_archive#archive#GotoBuffer'),
         \ 'ExtractAll':          function('edit_archive#archive#ExtractAll'),
         \ 'Tempname':            function('edit_archive#archive#Tempname'),
@@ -91,6 +93,33 @@ function! edit_archive#archive#Tempname(filename) dict
   exe 'cd '.cwd
 
   return self._tempdir.'/'.a:filename
+endfunction
+
+function! edit_archive#archive#Add(path) dict
+  let cwd = getcwd()
+  exe 'cd '.self._tempdir
+
+  let parent_dir = fnamemodify(a:path, ':h')
+  if parent_dir != '.'
+    if isdirectory(parent_dir)
+      call system('rm -r '.parent_dir)
+    endif
+    call mkdir(parent_dir, 'p')
+  endif
+
+  if a:path =~ '/$'
+    call mkdir(a:path, 'p')
+  else
+    call system('touch '.a:path)
+  endif
+
+  call self.backend.Add(a:path)
+
+  exe 'cd '.cwd
+endfunction
+
+function! edit_archive#archive#Delete(path) dict
+  call self.backend.Delete(a:path)
 endfunction
 
 function! s:Filesize(filename)
