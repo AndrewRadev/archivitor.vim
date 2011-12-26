@@ -11,14 +11,17 @@ function! edit_archive#archive#New(name)
     throw "Unrecognized archive"
   endif
 
+  let tempdir = tempname()
+  call mkdir(tempdir, 'p')
+
   return {
         \ 'backend':  backend,
         \ 'name':     name,
         \ 'format':   format,
         \
-        \ 'size':     s:Filesize(a:name),
-        \ '_tempdir': '',
-        \ '_bufnr':   bufnr('%'),
+        \ 'size':    s:Filesize(a:name),
+        \ 'tempdir': tempdir,
+        \ 'bufnr':   bufnr('%'),
         \
         \ 'Filelist':            function('edit_archive#archive#Filelist'),
         \ 'Add':                 function('edit_archive#archive#Add'),
@@ -41,14 +44,14 @@ function! edit_archive#archive#Rename(old_path, new_path) dict
   call self.backend.Delete(a:old_path)
 
   let cwd = getcwd()
-  exe 'cd '.self._tempdir
+  exe 'cd '.self.tempdir
   call rename(a:old_path, a:new_path)
   return self.backend.Add(a:new_path)
   exe 'cd '.cwd
 endfunction
 
 function! edit_archive#archive#GotoBuffer() dict
-  exe 'buffer '.self._bufnr
+  exe 'buffer '.self.bufnr
 endfunction
 
 function! edit_archive#archive#ExtractAll(dir) dict
@@ -73,43 +76,37 @@ endfunction
 
 function! edit_archive#archive#UpdateFile(filename) dict
   let real_filename    = a:filename
-  let archive_filename = substitute(a:filename, '^\V'.self._tempdir.'/', '', '')
+  let archive_filename = substitute(a:filename, '^\V'.self.tempdir.'/', '', '')
 
   let cwd = getcwd()
-  exe 'cd '.self._tempdir
+  exe 'cd '.self.tempdir
   call self.backend.Update(archive_filename)
   exe 'cd '.cwd
 endfunction
 
 function! edit_archive#archive#Tempname(filename) dict
-  if self._tempdir == ''
-    let self._tempdir = tempname()
-    call mkdir(self._tempdir)
-  endif
-
   let cwd = getcwd()
-  exe 'cd '.self._tempdir
+  exe 'cd '.self.tempdir
   call self.backend.Extract(a:filename)
   exe 'cd '.cwd
 
-  return self._tempdir.'/'.a:filename
+  return self.tempdir.'/'.a:filename
 endfunction
 
 function! edit_archive#archive#Add(path) dict
   let cwd = getcwd()
-  exe 'cd '.self._tempdir
-
-  let parent_dir = fnamemodify(a:path, ':h')
-  if parent_dir != '.'
-    if isdirectory(parent_dir)
-      call system('rm -r '.parent_dir)
-    endif
-    call mkdir(parent_dir, 'p')
-  endif
+  exe 'cd '.self.tempdir
 
   if a:path =~ '/$'
+    if isdirectory(a:path)
+      call system('rm -r '.a:path)
+    endif
     call mkdir(a:path, 'p')
   else
+    let parent_dir = fnamemodify(a:path, ':h')
+    if !isdirectory(parent_dir)
+      call mkdir(parent_dir, 'p')
+    endif
     call system('touch '.a:path)
   endif
 

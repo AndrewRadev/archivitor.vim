@@ -27,7 +27,7 @@ function! s:UpdateArchive()
 
   call cursor(1, 1)
   call search('=====', 'W')
-  let first_line = nextnonblank(line('.'))
+  let first_line = nextnonblank(line('.') + 1)
   if first_line <= 0
     call setpos('.', saved_cursor)
     return
