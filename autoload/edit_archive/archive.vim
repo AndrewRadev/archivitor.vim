@@ -1,55 +1,47 @@
 function! edit_archive#archive#New(name)
+  let name = fnamemodify(a:name, ':p')
+
   if a:name =~ '\.rar$'
-    return edit_archive#rar#New(a:name)
+    let format  = 'rar'
+    let backend = edit_archive#rar#New(name)
   elseif a:name =~ '\.zip$'
-    return edit_archive#zip#New(a:name)
+    let format  = 'zip'
+    let backend = edit_archive#zip#New(name)
   else
     throw "Unrecognized archive"
   endif
-endfunction
 
-function! edit_archive#archive#Common(name)
   return {
-        \ 'name':     fnamemodify(a:name, ':p'),
-        \ 'format':   fnamemodify(a:name, ':e'),
+        \ 'backend':  backend,
+        \ 'name':     name,
+        \ 'format':   format,
+        \
         \ 'size':     s:Filesize(a:name),
-        \ 'readonly': 0,
         \ '_tempdir': '',
         \ '_bufnr':   bufnr('%'),
         \
-        \ 'FileList': function('edit_archive#archive#FileList'),
-        \ 'Extract':  function('edit_archive#archive#Extract'),
-        \ 'Update':   function('edit_archive#archive#Update'),
-        \ 'Rename':   function('edit_archive#archive#Rename'),
-        \
+        \ 'Filelist':            function('edit_archive#archive#Filelist'),
+        \ 'Rename':              function('edit_archive#archive#Rename'),
         \ 'GotoBuffer':          function('edit_archive#archive#GotoBuffer'),
         \ 'ExtractAll':          function('edit_archive#archive#ExtractAll'),
         \ 'Tempname':            function('edit_archive#archive#Tempname'),
         \ 'SetupWriteBehaviour': function('edit_archive#archive#SetupWriteBehaviour'),
-        \ 'UpdateArchive':       function('edit_archive#archive#UpdateArchive'),
+        \ 'UpdateFile':          function('edit_archive#archive#UpdateFile'),
         \ }
 endfunction
 
-function! edit_archive#archive#FileList() dict
-  throw 'not implemented'
+function! edit_archive#archive#Filelist() dict
+  return self.backend.Filelist()
 endfunction
 
-function! edit_archive#archive#Extract(...) dict
-  throw 'not implemented'
-endfunction
-
-function! edit_archive#archive#Update(...) dict
-  throw 'not implemented'
-endfunction
-
-function! edit_archive#archive#Rename(old_name, new_name) dict
-  let tempfile = self.Tempname(a:old_name)
-  call system('zip -r '.self.name.' -d '.a:old_name)
+function! edit_archive#archive#Rename(old_path, new_path) dict
+  let tempfile = self.Tempname(a:old_path)
+  call self.backend.Delete(a:old_path)
 
   let cwd = getcwd()
   exe 'cd '.self._tempdir
-  call rename(a:old_name, a:new_name)
-  call system('zip -r '.self.name.' '.a:new_name)
+  call rename(a:old_path, a:new_path)
+  return self.backend.Add(a:new_path)
   exe 'cd '.cwd
 endfunction
 
@@ -65,25 +57,25 @@ function! edit_archive#archive#ExtractAll(dir) dict
 
   let cwd = getcwd()
   exe 'cd '.dir
-  call self.Extract()
+  call self.backend.Extract()
   exe 'cd '.cwd
 endfunction
 
 function! edit_archive#archive#SetupWriteBehaviour(filename) dict
-  if self.readonly
+  if self.backend.readonly
     set readonly
   else
-    autocmd BufWritePost <buffer> call b:archive.UpdateArchive(expand('<amatch>'))
+    autocmd BufWritePost <buffer> call b:archive.UpdateFile(expand('<amatch>'))
   endif
 endfunction
 
-function! edit_archive#archive#UpdateArchive(filename) dict
+function! edit_archive#archive#UpdateFile(filename) dict
   let real_filename    = a:filename
   let archive_filename = substitute(a:filename, '^\V'.self._tempdir.'/', '', '')
 
   let cwd = getcwd()
   exe 'cd '.self._tempdir
-  call self.Update(archive_filename)
+  call self.backend.Update(archive_filename)
   exe 'cd '.cwd
 endfunction
 
@@ -95,7 +87,7 @@ function! edit_archive#archive#Tempname(filename) dict
 
   let cwd = getcwd()
   exe 'cd '.self._tempdir
-  call self.Extract(a:filename)
+  call self.backend.Extract(a:filename)
   exe 'cd '.cwd
 
   return self._tempdir.'/'.a:filename

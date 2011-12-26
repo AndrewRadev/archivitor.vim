@@ -12,7 +12,7 @@ function! s:ReadArchive(archive)
   call add(banner, repeat('=', len(banner[0])))
   call append(0, banner)
 
-  let contents = s:Enumerate(b:archive.FileList())
+  let contents = s:Enumerate(b:archive.Filelist())
   call append(line('$'), contents)
   normal! gg
   set filetype=archive
@@ -45,7 +45,7 @@ function! s:UpdateArchive()
     return
   endif
 
-  let files = b:archive.FileList()
+  let files = b:archive.Filelist()
   for line in getline(first_line, line('$'))
     if line =~ '^\d\+.'
       " then it's an existing entry
