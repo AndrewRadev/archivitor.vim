@@ -1,5 +1,5 @@
 function! edit_archive#archive#New(name)
-  let name = fnamemodify(a:name, ':p')
+  let name = fnameescape(fnamemodify(a:name, ':p'))
 
   if a:name =~ '\.rar$'
     let format  = 'rar'
