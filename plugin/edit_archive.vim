@@ -1,14 +1,14 @@
 autocmd BufReadCmd *.rar call s:ReadArchive(expand('<afile>'))
 autocmd BufReadCmd *.zip call s:ReadArchive(expand('<afile>'))
+autocmd BufWriteCmd *.zip call s:UpdateArchive()
+autocmd BufWriteCmd *.rar call s:UpdateArchive()
 
 function! s:ReadArchive(archive)
-  exe 'edit '.tempname()
   let b:archive = edit_archive#archive#New(a:archive)
   call s:SetupArchiveBuffer()
 
   nnoremap <buffer> <cr> :call <SID>EditFile()<cr>
   command! -buffer -nargs=1 -complete=dir Extract call b:archive.ExtractAll(<f-args>)
-  autocmd BufWrite <buffer> call s:UpdateArchive()
 endfunction
 
 function! s:EditFile()
@@ -86,8 +86,13 @@ function! s:SetupArchiveBuffer()
   call append(0, banner)
 
   let contents = s:Enumerate(b:archive.Filelist())
+  set filetype=archive
+  setlocal buftype=acwrite
+  setlocal bufhidden=hide
   call append(line('$'), contents)
   normal! gg
-  set filetype=archive
-  set hidden
+  set nomodified
+  let short_filename = fnamemodify(b:archive.name, ':~:.')
+  let filename = 'archive://'.short_filename
+  silent exec 'keepalt file ' . escape(filename, '[')
 endfunction
