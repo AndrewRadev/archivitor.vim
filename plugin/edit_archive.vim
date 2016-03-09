@@ -5,16 +5,21 @@ function! s:ReadArchive(archive)
   let b:archive = edit_archive#archive#New(a:archive)
   call s:SetupArchiveBuffer()
 
-  nnoremap <buffer> <cr> :call <SID>EditFile()<cr>
+  nnoremap <buffer> <cr>       :call <SID>EditFile('edit')<cr>
+  nnoremap <buffer> gf         :call <SID>EditFile('edit')<cr>
+  nnoremap <buffer> <c-w>f     :call <SID>EditFile('split')<cr>
+  nnoremap <buffer> <c-w><c-f> :call <SID>EditFile('split')<cr>
+  nnoremap <buffer> <c-w>gf    :call <SID>EditFile('tabedit')<cr>
+
   command! -buffer -nargs=1 -complete=dir Extract call b:archive.ExtractAll(<f-args>)
 endfunction
 
-function! s:EditFile()
+function! s:EditFile(operation)
   let archive  = b:archive
-  let filename = expand('<cfile>')
+  let filename = s:FilenameOnLine()
   let tempname = archive.Tempname(filename)
 
-  exe 'edit '.tempname
+  exe a:operation.' '.tempname
   let b:archive = archive
   call b:archive.SetupWriteBehaviour(filename)
   command! -buffer Archive call b:archive.GotoBuffer()
@@ -87,10 +92,20 @@ function! s:SetupArchiveBuffer()
   set filetype=archive
   setlocal buftype=acwrite
   setlocal bufhidden=hide
+  setlocal isfname+=:
   call append(line('$'), contents)
   normal! gg
   set nomodified
   let short_filename = fnamemodify(b:archive.name, ':~:.')
   let filename = 'archive://'.short_filename
   silent exec 'keepalt file ' . escape(filename, '[')
+endfunction
+
+function! s:FilenameOnLine()
+  let line = getline('.')
+  if line !~ '^\s*\d\+\.'
+    return ''
+  endif
+
+  return substitute(line, '^\s*\d\+\. ', '', '')
 endfunction
