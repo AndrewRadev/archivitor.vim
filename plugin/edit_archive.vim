@@ -1,7 +1,5 @@
-autocmd BufReadCmd *.rar call s:ReadArchive(expand('<afile>'))
-autocmd BufReadCmd *.zip call s:ReadArchive(expand('<afile>'))
-autocmd BufWriteCmd *.zip call s:UpdateArchive()
-autocmd BufWriteCmd *.rar call s:UpdateArchive()
+autocmd BufReadCmd *.zip,*.rar,*.tar.gz call s:ReadArchive(expand('<afile>'))
+autocmd BufWriteCmd *.zip,*.rar,*.tar.gz call s:UpdateArchive()
 
 function! s:ReadArchive(archive)
   let b:archive = edit_archive#archive#New(a:archive)

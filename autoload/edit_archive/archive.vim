@@ -7,6 +7,9 @@ function! edit_archive#archive#New(name)
   elseif a:name =~ '\.zip$'
     let format  = 'zip'
     let backend = edit_archive#zip#New(name)
+  elseif a:name =~ '\.tar\.gz$'
+    let format  = 'targz'
+    let backend = edit_archive#targz#New(name)
   else
     throw "Unrecognized archive"
   endif
