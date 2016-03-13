@@ -1,6 +1,7 @@
 function! edit_archive#archive#New(name)
   let name = fnameescape(fnamemodify(a:name, ':p'))
 
+  " Filetype dispatch
   if a:name =~ '\.rar$'
     let format  = 'rar'
     let backend = edit_archive#rar#New(name)

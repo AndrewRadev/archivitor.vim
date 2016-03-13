@@ -47,4 +47,37 @@ describe "Tar files" do
     archive_contents = `tar -tf fixtures/test.tar`
     expect(archive_contents).to include 'test2.txt'
   end
+
+  it "can update tar.gz files' contents" do
+    vim.edit 'fixtures/test.tar.gz'
+
+    vim.search 'test.txt'
+    vim.normal 'otest2.txt'
+    vim.write
+
+    archive_contents = `tar -tf fixtures/test.tar.gz`
+    expect(archive_contents).to include 'test2.txt'
+  end
+
+  it "can update tar.bz2 files' contents" do
+    vim.edit 'fixtures/test.tar.bz2'
+
+    vim.search 'test.txt'
+    vim.normal 'otest2.txt'
+    vim.write
+
+    archive_contents = `tar -tf fixtures/test.tar.bz2`
+    expect(archive_contents).to include 'test2.txt'
+  end
+
+  it "can update tar.xz files' contents" do
+    vim.edit 'fixtures/test.tar.xz'
+
+    vim.search 'test.txt'
+    vim.normal 'otest2.txt'
+    vim.write
+
+    archive_contents = `tar -tf fixtures/test.tar.xz`
+    expect(archive_contents).to include 'test2.txt'
+  end
 end

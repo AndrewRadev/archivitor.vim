@@ -1,3 +1,5 @@
+let s:cached_tempfiles = {}
+
 function! edit_archive#tar#New(name)
   return {
         \ 'name':     a:name,
@@ -37,7 +39,40 @@ endfunction
 function! edit_archive#tar#Add(path) dict
   if self.name =~ '\.tar$'
     call system('tar -rf '.self.name.' '.a:path)
-  else
-    throw "Not implemented for archived tar files"
+    return
   endif
+
+  let cached_directory = s:CachedDir(self)
+  call system('cp -r '.a:path.' '.cached_directory)
+  call s:UpdateFromCachedDir(self)
+endfunction
+
+function! s:CachedDir(archive)
+  if has_key(s:cached_tempfiles, a:archive.name)
+    return s:cached_tempfiles[a:archive.name]
+  endif
+
+  let tempdir = tempname()
+  call mkdir(tempdir, 'p')
+
+  let cwd = getcwd()
+  exe 'cd '.tempdir
+  call a:archive.Extract()
+  exe 'cd '.cwd
+
+  let s:cached_tempfiles[a:archive.name] = tempdir
+  return s:cached_tempfiles[a:archive.name]
+endfunction
+
+function! s:UpdateFromCachedDir(archive)
+  if !has_key(s:cached_tempfiles, a:archive.name)
+    return
+  endif
+
+  let directory = s:cached_tempfiles[a:archive.name]
+
+  let cwd = getcwd()
+  exe 'cd '.directory
+  call system('tar -caf '.a:archive.name.' *')
+  exe 'cd '.cwd
 endfunction
