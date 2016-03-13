@@ -1,5 +1,23 @@
-autocmd BufReadCmd *.zip,*.rar,*.tar.gz call s:ReadArchive(expand('<afile>'))
-autocmd BufWriteCmd *.zip,*.rar,*.tar.gz call s:UpdateArchive()
+" Prevent built-in tar and zip plugins from loading
+let g:loaded_tarPlugin = 1
+let g:loaded_tar       = 1
+let g:loaded_zipPlugin = 1
+let g:loaded_zip       = 1
+
+" Disable tar/zip plugin if it's loaded anyway
+augroup tar
+  autocmd!
+augroup END
+augroup zip
+  autocmd!
+augroup END
+
+augroup edit_archive
+  autocmd!
+
+  autocmd BufReadCmd *.zip,*.rar,*.tar.{gz,bz2,xz} call s:ReadArchive(expand('<afile>'))
+  autocmd BufWriteCmd *.zip,*.rar,*.tar.{gz,bz2,xz} call s:UpdateArchive()
+augroup END
 
 function! s:ReadArchive(archive)
   let b:archive = edit_archive#archive#New(a:archive)
