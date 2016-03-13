@@ -27,8 +27,6 @@ endfunction
 " TODO (2016-03-09) Doesn't work with compressed archives...
 function! edit_archive#tar#Update(...) dict
   throw "Not implemented"
-  " let files = join(a:000, ' ')
-  " call system('tar -rf '.self.name.' '.files)
 endfunction
 
 function! edit_archive#tar#Delete(path) dict
@@ -37,6 +35,9 @@ function! edit_archive#tar#Delete(path) dict
 endfunction
 
 function! edit_archive#tar#Add(path) dict
-  throw "Not implemented"
-  " call system('tar -r '.self.name.' '.a:path)
+  if self.name =~ '\.tar$'
+    call system('tar -rf '.self.name.' '.a:path)
+  else
+    throw "Not implemented for archived tar files"
+  endif
 endfunction

@@ -15,8 +15,15 @@ augroup END
 augroup edit_archive
   autocmd!
 
-  autocmd BufReadCmd *.zip,*.rar,*.tar.{gz,bz2,xz} call s:ReadArchive(expand('<afile>'))
-  autocmd BufWriteCmd *.zip,*.rar,*.tar.{gz,bz2,xz} call s:UpdateArchive()
+  autocmd BufReadCmd *.zip             call s:ReadArchive(expand('<afile>'))
+  autocmd BufReadCmd *.rar             call s:ReadArchive(expand('<afile>'))
+  autocmd BufReadCmd *.tar             call s:ReadArchive(expand('<afile>'))
+  autocmd BufReadCmd *.tar.{gz,bz2,xz} call s:ReadArchive(expand('<afile>'))
+
+  autocmd BufWriteCmd *.zip             call s:UpdateArchive()
+  autocmd BufWriteCmd *.rar             call s:UpdateArchive()
+  autocmd BufWriteCmd *.tar             call s:UpdateArchive()
+  autocmd BufWriteCmd *.tar.{gz,bz2,xz} call s:UpdateArchive()
 augroup END
 
 function! s:ReadArchive(archive)
