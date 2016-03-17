@@ -109,9 +109,9 @@ function! s:SetupArchiveBuffer()
   %delete _
 
   let banner = []
-  call add(banner, 'File: '   . b:archive.name)
+  call add(banner, 'File:   ' . b:archive.name)
   call add(banner, 'Format: ' . b:archive.format)
-  call add(banner, 'Size: '   . b:archive.size)
+  call add(banner, 'Size:   ' . b:archive.size)
   call add(banner, repeat('=', len(banner[0])))
   call append(0, banner)
 
