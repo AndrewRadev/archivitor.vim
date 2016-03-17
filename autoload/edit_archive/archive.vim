@@ -74,7 +74,10 @@ function! edit_archive#archive#SetupWriteBehaviour(filename) dict
   if self.backend.readonly
     set readonly
   else
-    autocmd BufWritePost <buffer> call b:archive.UpdateFile(expand('<amatch>'))
+    augroup edit_archive_write_behaviour
+      autocmd!
+      autocmd BufWritePost <buffer> call b:archive.UpdateFile(expand('<amatch>'))
+    augroup END
   endif
 endfunction
 

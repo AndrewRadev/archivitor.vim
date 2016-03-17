@@ -3,7 +3,7 @@ require 'vimrunner/rspec'
 require_relative './support/vim'
 
 Vimrunner::RSpec.configure do |config|
-  config.reuse_server = false
+  config.reuse_server = true
 
   plugin_path = File.expand_path('.')
 

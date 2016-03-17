@@ -25,7 +25,7 @@ endfunction
 
 function! edit_archive#zip#Extract(...) dict
   let files = join(a:000, ' ')
-  call edit_archive#System('unzip '.self.name.' '.files)
+  call edit_archive#System('unzip -o '.self.name.' '.files)
 endfunction
 
 function! edit_archive#zip#Update(...) dict
