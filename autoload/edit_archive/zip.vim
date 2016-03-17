@@ -12,27 +12,31 @@ function! edit_archive#zip#New(name)
 endfunction
 
 function! edit_archive#zip#Filelist() dict
+  let file_line_pattern = '\v^\s*\d+\s*\d+-\d+-\d+\s*\d+:\d+\s*(.*)$'
   let file_list = []
-  for line in split(system('unzip -qql ' . self.name), "\n")
-    call add(file_list, substitute(line, '\v^\s*\d+\s*\d+-\d+-\d+\s*\d+:\d+\s*(.*)$', '\1', ''))
+
+  for line in split(edit_archive#System('unzip -qql ' . self.name), "\n")
+    if line =~ file_line_pattern
+      call add(file_list, substitute(line, file_line_pattern, '\1', ''))
+    endif
   endfor
   return sort(file_list)
 endfunction
 
 function! edit_archive#zip#Extract(...) dict
   let files = join(a:000, ' ')
-  call system('unzip '.self.name.' '.files)
+  call edit_archive#System('unzip '.self.name.' '.files)
 endfunction
 
 function! edit_archive#zip#Update(...) dict
   let files = join(a:000, ' ')
-  call system('zip -u '.self.name.' '.files)
+  call edit_archive#System('zip -u '.self.name.' '.files)
 endfunction
 
 function! edit_archive#zip#Delete(path) dict
-  call system('zip -r '.self.name.' -d '.a:path)
+  call edit_archive#System('zip '.self.name.' -d '.a:path)
 endfunction
 
 function! edit_archive#zip#Add(path) dict
-  call system('zip -r '.self.name.' '.a:path)
+  call edit_archive#System('zip -r '.self.name.' '.a:path)
 endfunction

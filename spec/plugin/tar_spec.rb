@@ -80,4 +80,50 @@ describe "Tar files" do
     archive_contents = `tar -tf fixtures/test.tar.xz`
     expect(archive_contents).to include 'test2.txt'
   end
+
+  it "can update files within tar files" do
+    vim.edit 'fixtures/test.tar'
+
+    vim.search 'test.txt'
+    vim.feedkeys 'gf'
+    vim.feedkeys 'cwchanged'
+    vim.write
+
+    system 'tar xf fixtures/test.tar'
+    expect(File.read('test.txt').strip).to eq 'changed'
+  end
+
+  it "can update files within compressed tar files" do
+    vim.edit 'fixtures/test.tar.gz'
+
+    vim.search 'test.txt'
+    vim.feedkeys 'gf'
+    vim.feedkeys 'cwchanged'
+    vim.write
+
+    system 'tar xzf fixtures/test.tar.gz'
+    expect(File.read('test.txt').strip).to eq 'changed'
+  end
+
+  it "can delete files in tar archives" do
+    vim.edit 'fixtures/test.tar'
+
+    vim.search 'test.txt'
+    vim.feedkeys 'dd'
+    vim.write
+
+    system 'tar xf fixtures/test.tar'
+    expect(File.exists?('test.txt')).to be_falsey
+  end
+
+  it "can delete files in compressed tar archives" do
+    vim.edit 'fixtures/test.tar.gz'
+
+    vim.search 'test.txt'
+    vim.feedkeys 'dd'
+    vim.write
+
+    system 'tar xzf fixtures/test.tar.gz'
+    expect(File.exists?('test.txt')).to be_falsey
+  end
 end

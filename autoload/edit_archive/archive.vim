@@ -103,7 +103,7 @@ function! edit_archive#archive#Add(path) dict
 
   if a:path =~ '/$'
     if isdirectory(a:path)
-      call system('rm -r '.a:path)
+      call edit_archive#System('rm -r '.a:path)
     endif
     call mkdir(a:path, 'p')
   else
@@ -111,7 +111,7 @@ function! edit_archive#archive#Add(path) dict
     if !isdirectory(parent_dir)
       call mkdir(parent_dir, 'p')
     endif
-    call system('touch '.a:path)
+    call edit_archive#System('touch '.a:path)
   endif
 
   call self.backend.Add(a:path)

@@ -15,7 +15,7 @@ endfunction
 
 function! edit_archive#tar#Filelist() dict
   let file_list = []
-  for line in split(system('tar -tf ' . self.name), "\n")
+  for line in split(edit_archive#System('tar -tf ' . self.name), "\n")
     call add(file_list, substitute(line, '\v^\s*\d+\s*\d+-\d+-\d+\s*\d+:\d+\s*(.*)$', '\1', ''))
   endfor
   return sort(file_list)
@@ -23,27 +23,46 @@ endfunction
 
 function! edit_archive#tar#Extract(...) dict
   let files = join(a:000, ' ')
-  call system('tar -xf '.self.name.' '.files)
+  call edit_archive#System('tar -xf '.self.name.' '.files)
 endfunction
 
-" TODO (2016-03-09) Doesn't work with compressed archives...
 function! edit_archive#tar#Update(...) dict
-  throw "Not implemented"
-endfunction
+  let files = join(a:000, ' ')
 
-function! edit_archive#tar#Delete(path) dict
-  throw "Not implemented"
-  " call system('tar -r '.self.name.' -d '.a:path)
-endfunction
-
-function! edit_archive#tar#Add(path) dict
   if self.name =~ '\.tar$'
-    call system('tar -rf '.self.name.' '.a:path)
+    call edit_archive#System('tar -rf '.self.name.' '.files)
     return
   endif
 
   let cached_directory = s:CachedDir(self)
-  call system('cp -r '.a:path.' '.cached_directory)
+  call edit_archive#System('cp -r '.files.' '.cached_directory)
+  call s:UpdateFromCachedDir(self)
+endfunction
+
+function! edit_archive#tar#Delete(path) dict
+  if self.name =~ '\.tar$'
+    call edit_archive#System('tar --delete -f '.self.name.' '.a:path)
+    return
+  endif
+
+  let cached_directory = s:CachedDir(self)
+  if len(glob(cached_directory.'/*', '', 1)) <= 1
+    echoerr "Can't delete last file in archive"
+    return
+  endif
+
+  call edit_archive#System('rm -r '.cached_directory.'/'.a:path)
+  call s:UpdateFromCachedDir(self)
+endfunction
+
+function! edit_archive#tar#Add(path) dict
+  if self.name =~ '\.tar$'
+    call edit_archive#System('tar -rf '.self.name.' '.a:path)
+    return
+  endif
+
+  let cached_directory = s:CachedDir(self)
+  call edit_archive#System('cp -r '.a:path.' '.cached_directory)
   call s:UpdateFromCachedDir(self)
 endfunction
 
@@ -73,6 +92,6 @@ function! s:UpdateFromCachedDir(archive)
 
   let cwd = getcwd()
   exe 'cd '.directory
-  call system('tar -caf '.a:archive.name.' *')
+  call edit_archive#System('tar -caf '.a:archive.name.' *')
   exe 'cd '.cwd
 endfunction

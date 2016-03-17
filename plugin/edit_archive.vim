@@ -53,33 +53,35 @@ endfunction
 function! s:UpdateArchive()
   let saved_cursor = getpos('.')
 
-  call cursor(1, 1)
-  call search('=====', 'W')
-  let first_line = nextnonblank(line('.') + 1)
-  if first_line <= 0
-    call setpos('.', saved_cursor)
-    return
-  endif
-
   let files             = b:archive.Filelist()
   let remaining_indices = range(len(files))
 
-  for line in getline(first_line, line('$'))
-    if line =~ '^\d\+.'
-      " then it's an existing entry
-      let index         = str2nr(matchstr(line, '^\d\+\ze.'))
-      let path          = strpart(line, strlen(index) + 2)
-      let original_path = files[index]
-      call remove(remaining_indices, index(remaining_indices, index))
+  call cursor(1, 1)
+  call search('=====', 'W')
+  let first_line = nextnonblank(line('.') + 1)
 
-      if original_path != path
-        call b:archive.Rename(original_path, path)
+  if first_line
+    " then we have lines we need to parse
+    for line in getline(first_line, line('$'))
+      if line =~ '^\d\+.'
+        " then it's an existing entry
+        let index         = str2nr(matchstr(line, '^\d\+\ze.'))
+        let path          = strpart(line, strlen(index) + 2)
+        let original_path = files[index]
+        call remove(remaining_indices, index(remaining_indices, index))
+
+        if original_path != path
+          call b:archive.Rename(original_path, path)
+        endif
+      else
+        " it's a new entry
+        call b:archive.Add(line)
       endif
-    else
-      " it's a new entry
-      call b:archive.Add(line)
-    endif
-  endfor
+    endfor
+  else
+    " no lines, everything has been deleted, it seems
+    call setpos('.', saved_cursor)
+  endif
 
   for index in remaining_indices
     let missing_path = files[index]
@@ -121,9 +123,6 @@ function! s:SetupArchiveBuffer()
   call append(line('$'), contents)
   normal! gg
   set nomodified
-  let short_filename = fnamemodify(b:archive.name, ':~:.')
-  let filename = 'archive://'.short_filename
-  silent exec 'keepalt file ' . escape(filename, '[')
 endfunction
 
 function! s:FilenameOnLine()
