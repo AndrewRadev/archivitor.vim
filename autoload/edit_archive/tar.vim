@@ -56,6 +56,11 @@ function! edit_archive#tar#Delete(path) dict
 endfunction
 
 function! edit_archive#tar#Add(path) dict
+  if !filereadable(self.name)
+    call edit_archive#System('tar -caf '.self.name.' '.a:path)
+    return
+  endif
+
   if self.name =~ '\.tar$'
     call edit_archive#System('tar -rf '.self.name.' '.a:path)
     return

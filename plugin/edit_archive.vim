@@ -28,7 +28,7 @@ augroup END
 
 function! s:ReadArchive(archive)
   let b:archive = edit_archive#archive#New(a:archive)
-  call s:SetupArchiveBuffer()
+  call s:RenderArchiveBuffer()
 
   nnoremap <buffer> <cr>       :call <SID>EditFile('edit')<cr>
   nnoremap <buffer> gf         :call <SID>EditFile('edit')<cr>
@@ -47,7 +47,7 @@ function! s:EditFile(operation)
   exe a:operation.' '.tempname
   let b:archive = archive
   call b:archive.SetupWriteBehaviour(filename)
-  command! -buffer Archive call b:archive.GotoBuffer()
+  command! -buffer Archive call b:archive.GotoBuffer() | call s:RenderArchiveBuffer()
 endfunction
 
 function! s:UpdateArchive()
@@ -88,7 +88,7 @@ function! s:UpdateArchive()
     call b:archive.Delete(missing_path)
   endfor
 
-  call s:SetupArchiveBuffer()
+  call s:RenderArchiveBuffer()
 
   call setpos('.', saved_cursor)
 endfunction
@@ -105,7 +105,7 @@ function! s:Enumerate(file_list)
   return enumerated_list
 endfunction
 
-function! s:SetupArchiveBuffer()
+function! s:RenderArchiveBuffer()
   %delete _
 
   let banner = []

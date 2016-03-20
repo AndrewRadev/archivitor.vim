@@ -126,4 +126,24 @@ describe "Tar files" do
     system 'tar xzf fixtures/test.tar.gz'
     expect(File.exists?('test.txt')).to be_falsey
   end
+
+  it "can create a brand new tar archive" do
+    expect {
+      vim.edit 'new_archive.tar'
+      vim.feedkeys 'Gotest.txt'
+      vim.write
+    }.to change{
+      File.exists?('new_archive.tar')
+    }.from(false).to(true)
+  end
+
+  it "can create a brand new compressed tar archive" do
+    expect {
+      vim.edit 'new_archive.tar.gz'
+      vim.feedkeys 'Gotest.txt'
+      vim.write
+    }.to change{
+      File.exists?('new_archive.tar.gz')
+    }.from(false).to(true)
+  end
 end

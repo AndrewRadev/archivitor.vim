@@ -43,4 +43,14 @@ describe "Zip files" do
     system 'unzip fixtures/test.zip'
     expect(File.exists?('test.txt')).to be_falsey
   end
+
+  it "can create a brand new archive" do
+    expect {
+      vim.edit 'new_archive.zip'
+      vim.feedkeys 'Gotest.txt'
+      vim.write
+    }.to change{
+      File.exists?('new_archive.zip')
+    }.from(false).to(true)
+  end
 end

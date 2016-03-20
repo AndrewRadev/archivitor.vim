@@ -5,3 +5,7 @@ function! edit_archive#System(command)
   endif
   return result
 endfunction
+
+function! edit_archive#SilentSystem(command)
+  return system(a:command)
+endfunction

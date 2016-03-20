@@ -36,11 +36,16 @@ function! edit_archive#archive#New(name)
         \ 'Tempname':            function('edit_archive#archive#Tempname'),
         \ 'SetupWriteBehaviour': function('edit_archive#archive#SetupWriteBehaviour'),
         \ 'UpdateFile':          function('edit_archive#archive#UpdateFile'),
+        \ 'UpdateInfo':          function('edit_archive#archive#UpdateInfo'),
         \ }
 endfunction
 
 function! edit_archive#archive#Filelist() dict
-  return self.backend.Filelist()
+  if filereadable(self.name)
+    return self.backend.Filelist()
+  else
+    return []
+  endif
 endfunction
 
 function! edit_archive#archive#Rename(old_path, new_path) dict
@@ -89,6 +94,7 @@ function! edit_archive#archive#UpdateFile(filename) dict
   exe 'cd '.self.tempdir
   call self.backend.Update(archive_filename)
   exe 'cd '.cwd
+  call self.UpdateInfo()
 endfunction
 
 function! edit_archive#archive#Tempname(filename) dict
@@ -118,15 +124,21 @@ function! edit_archive#archive#Add(path) dict
   endif
 
   call self.backend.Add(a:path)
+  call self.UpdateInfo()
 
   exe 'cd '.cwd
 endfunction
 
 function! edit_archive#archive#Delete(path) dict
   call self.backend.Delete(a:path)
+  call self.UpdateInfo()
 endfunction
 
 function! s:Filesize(filename)
+  if !filereadable(a:filename)
+    return '0B (new)'
+  endif
+
   let bytes = getfsize(a:filename)
 
   if bytes >= 1024 * 1024
@@ -140,4 +152,8 @@ function! s:Filesize(filename)
   let size = substitute(size, '\.\d\d\zs\d\+\ze\w', '', '')
 
   return size
+endfunction
+
+function! edit_archive#archive#UpdateInfo() dict
+  let self.size = s:Filesize(self.name)
 endfunction

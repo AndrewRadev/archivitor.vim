@@ -15,7 +15,7 @@ function! edit_archive#zip#Filelist() dict
   let file_line_pattern = '\v^\s*\d+\s*\d+-\d+-\d+\s*\d+:\d+\s*(.*)$'
   let file_list = []
 
-  for line in split(edit_archive#System('unzip -qql ' . self.name), "\n")
+  for line in split(edit_archive#SilentSystem('unzip -qql ' . self.name), "\n")
     if line =~ file_line_pattern
       call add(file_list, substitute(line, file_line_pattern, '\1', ''))
     endif
