@@ -50,7 +50,7 @@ endfunction
 
 function! edit_archive#archive#Rename(old_path, new_path) dict
   let tempfile = self.Tempname(a:old_path)
-  call self.backend.Delete(a:old_path)
+  call self.backend.Delete([a:old_path])
 
   let cwd = getcwd()
   exe 'cd '.self.tempdir
@@ -129,8 +129,8 @@ function! edit_archive#archive#Add(path) dict
   exe 'cd '.cwd
 endfunction
 
-function! edit_archive#archive#Delete(path) dict
-  call self.backend.Delete(a:path)
+function! edit_archive#archive#Delete(paths) dict
+  call self.backend.Delete(a:paths)
   call self.UpdateInfo()
 endfunction
 

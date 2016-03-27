@@ -83,10 +83,8 @@ function! s:UpdateArchive()
     call setpos('.', saved_cursor)
   endif
 
-  for index in remaining_indices
-    let missing_path = files[index]
-    call b:archive.Delete(missing_path)
-  endfor
+  let missing_files = map(remaining_indices, 'files[v:val]')
+  call b:archive.Delete(missing_files)
 
   call s:RenderArchiveBuffer()
 

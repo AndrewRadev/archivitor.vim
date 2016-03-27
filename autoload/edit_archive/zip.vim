@@ -33,8 +33,9 @@ function! edit_archive#zip#Update(...) dict
   call edit_archive#System('zip -u '.shellescape(self.name).' '.files)
 endfunction
 
-function! edit_archive#zip#Delete(path) dict
-  call edit_archive#System('zip '.shellescape(self.name).' -d '.a:path)
+function! edit_archive#zip#Delete(paths) dict
+  let paths = join(a:paths, ' ')
+  call edit_archive#System('zip '.shellescape(self.name).' -d '.paths)
 endfunction
 
 function! edit_archive#zip#Add(path) dict

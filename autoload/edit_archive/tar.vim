@@ -39,9 +39,10 @@ function! edit_archive#tar#Update(...) dict
   call s:UpdateFromCachedDir(self)
 endfunction
 
-function! edit_archive#tar#Delete(path) dict
+function! edit_archive#tar#Delete(paths) dict
   if self.name =~ '\.tar$'
-    call edit_archive#System('tar --delete -f '.shellescape(self.name).' '.a:path)
+    let paths = join(a:paths, ' ')
+    call edit_archive#System('tar --delete -f '.shellescape(self.name).' '.paths)
     return
   endif
 
@@ -51,7 +52,9 @@ function! edit_archive#tar#Delete(path) dict
     return
   endif
 
-  call edit_archive#System('rm -r '.cached_directory.'/'.a:path)
+  let paths = join(map(a:paths, 'cached_directory."/".v:val'), ' ')
+
+  call edit_archive#System('rm -r '.paths)
   call s:UpdateFromCachedDir(self)
 endfunction
 
