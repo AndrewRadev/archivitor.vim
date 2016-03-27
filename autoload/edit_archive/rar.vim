@@ -12,7 +12,7 @@ function! edit_archive#rar#New(name)
 endfunction
 
 function! edit_archive#rar#Filelist() dict
-  let initial_file_list = sort(split(edit_archive#System('unrar vb ' . self.name), "\n"))
+  let initial_file_list = sort(split(edit_archive#System('unrar vb ' . shellescape(self.name)), "\n"))
 
   let files       = []
   let directories = []
@@ -40,7 +40,7 @@ endfunction
 
 function! edit_archive#rar#Extract(...) dict
   let files = join(a:000, ' ')
-  call edit_archive#System('unrar x '.self.name.' '.files)
+  call edit_archive#System('unrar x '.shellescape(self.name).' '.files)
 endfunction
 
 function! edit_archive#rar#Update(...) dict

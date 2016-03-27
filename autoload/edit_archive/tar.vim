@@ -15,7 +15,7 @@ endfunction
 
 function! edit_archive#tar#Filelist() dict
   let file_list = []
-  for line in split(edit_archive#System('tar -tf ' . self.name), "\n")
+  for line in split(edit_archive#System('tar -tf ' . shellescape(self.name)), "\n")
     call add(file_list, substitute(line, '\v^\s*\d+\s*\d+-\d+-\d+\s*\d+:\d+\s*(.*)$', '\1', ''))
   endfor
   return sort(file_list)
@@ -23,14 +23,14 @@ endfunction
 
 function! edit_archive#tar#Extract(...) dict
   let files = join(a:000, ' ')
-  call edit_archive#System('tar -xf '.self.name.' '.files)
+  call edit_archive#System('tar -xf '.shellescape(self.name).' '.files)
 endfunction
 
 function! edit_archive#tar#Update(...) dict
   let files = join(a:000, ' ')
 
   if self.name =~ '\.tar$'
-    call edit_archive#System('tar -rf '.self.name.' '.files)
+    call edit_archive#System('tar -rf '.shellescape(self.name).' '.files)
     return
   endif
 
@@ -41,7 +41,7 @@ endfunction
 
 function! edit_archive#tar#Delete(path) dict
   if self.name =~ '\.tar$'
-    call edit_archive#System('tar --delete -f '.self.name.' '.a:path)
+    call edit_archive#System('tar --delete -f '.shellescape(self.name).' '.a:path)
     return
   endif
 
@@ -57,12 +57,12 @@ endfunction
 
 function! edit_archive#tar#Add(path) dict
   if !filereadable(self.name)
-    call edit_archive#System('tar -caf '.self.name.' '.a:path)
+    call edit_archive#System('tar -caf '.shellescape(self.name).' '.a:path)
     return
   endif
 
   if self.name =~ '\.tar$'
-    call edit_archive#System('tar -rf '.self.name.' '.a:path)
+    call edit_archive#System('tar -rf '.shellescape(self.name).' '.a:path)
     return
   endif
 
