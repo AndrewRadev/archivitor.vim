@@ -5,6 +5,9 @@ function! edit_archive#archive#New(name)
   if a:name =~ '\.rar$'
     let format  = 'rar'
     let backend = edit_archive#rar#New(name)
+  elseif a:name =~ '\.7z$'
+    let format  = '7z'
+    let backend = edit_archive#7z#New(name)
   elseif a:name =~ '\.zip$'
     let format  = 'zip'
     let backend = edit_archive#zip#New(name)

@@ -17,11 +17,13 @@ augroup edit_archive
 
   autocmd BufReadCmd *.zip             call s:ReadArchive(expand('<afile>'))
   autocmd BufReadCmd *.rar             call s:ReadArchive(expand('<afile>'))
+  autocmd BufReadCmd *.7z              call s:ReadArchive(expand('<afile>'))
   autocmd BufReadCmd *.tar             call s:ReadArchive(expand('<afile>'))
   autocmd BufReadCmd *.tar.{gz,bz2,xz} call s:ReadArchive(expand('<afile>'))
 
   autocmd BufWriteCmd *.zip             call s:UpdateArchive()
   autocmd BufWriteCmd *.rar             call s:UpdateArchive()
+  autocmd BufWriteCmd *.7z              call s:UpdateArchive()
   autocmd BufWriteCmd *.tar             call s:UpdateArchive()
   autocmd BufWriteCmd *.tar.{gz,bz2,xz} call s:UpdateArchive()
 augroup END
@@ -84,7 +86,9 @@ function! s:UpdateArchive()
   endif
 
   let missing_files = map(remaining_indices, 'files[v:val]')
-  call b:archive.Delete(missing_files)
+  if len(missing_files) > 0
+    call b:archive.Delete(missing_files)
+  endif
 
   call s:RenderArchiveBuffer()
 
