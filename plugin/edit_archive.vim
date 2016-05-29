@@ -121,13 +121,16 @@ function! s:RenderArchiveBuffer()
   call append(line('$'), contents)
   normal! gg
   set nomodified
+  let b:skip_clean_whitepaste = 1
 endfunction
 
 function! s:FilenameOnLine()
   let line = getline('.')
-  if line !~ '^\s*\d\+\.'
+  let line_number_pattern = '^\s*\d\+\. '
+
+  if line !~ line_number_pattern
     return ''
   endif
 
-  return substitute(line, '^\s*\d\+\. ', '', '')
+  return substitute(line, line_number_pattern, '', '')
 endfunction
