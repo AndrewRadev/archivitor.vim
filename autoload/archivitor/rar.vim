@@ -1,18 +1,18 @@
-function! edit_archive#rar#New(name)
+function! archivitor#rar#New(name)
   return {
         \ 'name':     a:name,
         \ 'readonly': 1,
         \
-        \ 'Filelist': function('edit_archive#rar#Filelist'),
-        \ 'Extract':  function('edit_archive#rar#Extract'),
-        \ 'Update':   function('edit_archive#rar#Update'),
-        \ 'Add':      function('edit_archive#rar#Add'),
-        \ 'Delete':   function('edit_archive#rar#Delete'),
+        \ 'Filelist': function('archivitor#rar#Filelist'),
+        \ 'Extract':  function('archivitor#rar#Extract'),
+        \ 'Update':   function('archivitor#rar#Update'),
+        \ 'Add':      function('archivitor#rar#Add'),
+        \ 'Delete':   function('archivitor#rar#Delete'),
         \ }
 endfunction
 
-function! edit_archive#rar#Filelist() dict
-  let initial_file_list = sort(split(edit_archive#System('unrar vb ' . shellescape(self.name)), "\n"))
+function! archivitor#rar#Filelist() dict
+  let initial_file_list = sort(split(archivitor#System('unrar vb ' . shellescape(self.name)), "\n"))
 
   let files       = []
   let directories = []
@@ -38,19 +38,19 @@ function! edit_archive#rar#Filelist() dict
   return sort(files + directories)
 endfunction
 
-function! edit_archive#rar#Extract(...) dict
+function! archivitor#rar#Extract(...) dict
   let files = join(a:000, ' ')
-  call edit_archive#System('unrar x '.shellescape(self.name).' '.files)
+  call archivitor#System('unrar x '.shellescape(self.name).' '.files)
 endfunction
 
-function! edit_archive#rar#Update(...) dict
+function! archivitor#rar#Update(...) dict
   throw "RAR files are read-only"
 endfunction
 
-function! edit_archive#rar#Add(...) dict
+function! archivitor#rar#Add(...) dict
   throw "RAR files are read-only"
 endfunction
 
-function! edit_archive#rar#Delete(...) dict
+function! archivitor#rar#Delete(...) dict
   throw "RAR files are read-only"
 endfunction

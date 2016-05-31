@@ -1,19 +1,19 @@
-function! edit_archive#archive#New(name)
+function! archivitor#archive#New(name)
   let name = fnamemodify(a:name, ':p')
 
   " Filetype dispatch
   if a:name =~ '\.rar$'
     let format  = 'rar'
-    let backend = edit_archive#rar#New(name)
+    let backend = archivitor#rar#New(name)
   elseif a:name =~ '\.7z$'
     let format  = '7z'
-    let backend = edit_archive#7z#New(name)
+    let backend = archivitor#7z#New(name)
   elseif a:name =~ '\.zip$'
     let format  = 'zip'
-    let backend = edit_archive#zip#New(name)
+    let backend = archivitor#zip#New(name)
   elseif a:name =~ '\.tar\%(\.\%(gz\|bz2\|xz\)\)\?$'
     let format  = 'tar'
-    let backend = edit_archive#tar#New(name)
+    let backend = archivitor#tar#New(name)
   else
     throw "Unrecognized archive"
   endif
@@ -30,20 +30,20 @@ function! edit_archive#archive#New(name)
         \ 'tempdir': tempdir,
         \ 'bufnr':   bufnr('%'),
         \
-        \ 'Filelist':            function('edit_archive#archive#Filelist'),
-        \ 'Add':                 function('edit_archive#archive#Add'),
-        \ 'Rename':              function('edit_archive#archive#Rename'),
-        \ 'Delete':              function('edit_archive#archive#Delete'),
-        \ 'GotoBuffer':          function('edit_archive#archive#GotoBuffer'),
-        \ 'ExtractAll':          function('edit_archive#archive#ExtractAll'),
-        \ 'Tempname':            function('edit_archive#archive#Tempname'),
-        \ 'SetupWriteBehaviour': function('edit_archive#archive#SetupWriteBehaviour'),
-        \ 'UpdateFile':          function('edit_archive#archive#UpdateFile'),
-        \ 'UpdateInfo':          function('edit_archive#archive#UpdateInfo'),
+        \ 'Filelist':            function('archivitor#archive#Filelist'),
+        \ 'Add':                 function('archivitor#archive#Add'),
+        \ 'Rename':              function('archivitor#archive#Rename'),
+        \ 'Delete':              function('archivitor#archive#Delete'),
+        \ 'GotoBuffer':          function('archivitor#archive#GotoBuffer'),
+        \ 'ExtractAll':          function('archivitor#archive#ExtractAll'),
+        \ 'Tempname':            function('archivitor#archive#Tempname'),
+        \ 'SetupWriteBehaviour': function('archivitor#archive#SetupWriteBehaviour'),
+        \ 'UpdateFile':          function('archivitor#archive#UpdateFile'),
+        \ 'UpdateInfo':          function('archivitor#archive#UpdateInfo'),
         \ }
 endfunction
 
-function! edit_archive#archive#Filelist() dict
+function! archivitor#archive#Filelist() dict
   if filereadable(self.name)
     return self.backend.Filelist()
   else
@@ -51,7 +51,7 @@ function! edit_archive#archive#Filelist() dict
   endif
 endfunction
 
-function! edit_archive#archive#Rename(old_path, new_path) dict
+function! archivitor#archive#Rename(old_path, new_path) dict
   let tempfile = self.Tempname(a:old_path)
   call self.backend.Delete([a:old_path])
 
@@ -62,11 +62,11 @@ function! edit_archive#archive#Rename(old_path, new_path) dict
   exe 'cd '.cwd
 endfunction
 
-function! edit_archive#archive#GotoBuffer() dict
+function! archivitor#archive#GotoBuffer() dict
   exe 'buffer '.self.bufnr
 endfunction
 
-function! edit_archive#archive#ExtractAll(dir) dict
+function! archivitor#archive#ExtractAll(dir) dict
   let dir = fnamemodify(a:dir, ':p')
   if !isdirectory(dir)
     call mkdir(dir, 'p')
@@ -78,7 +78,7 @@ function! edit_archive#archive#ExtractAll(dir) dict
   exe 'cd '.cwd
 endfunction
 
-function! edit_archive#archive#SetupWriteBehaviour(filename) dict
+function! archivitor#archive#SetupWriteBehaviour(filename) dict
   if self.backend.readonly
     set readonly
   else
@@ -89,7 +89,7 @@ function! edit_archive#archive#SetupWriteBehaviour(filename) dict
   endif
 endfunction
 
-function! edit_archive#archive#UpdateFile(filename) dict
+function! archivitor#archive#UpdateFile(filename) dict
   let real_filename    = a:filename
   let archive_filename = substitute(a:filename, '^\V'.self.tempdir.'/', '', '')
 
@@ -100,7 +100,7 @@ function! edit_archive#archive#UpdateFile(filename) dict
   call self.UpdateInfo()
 endfunction
 
-function! edit_archive#archive#Tempname(filename) dict
+function! archivitor#archive#Tempname(filename) dict
   let cwd = getcwd()
   exe 'cd '.self.tempdir
   call self.backend.Extract(a:filename)
@@ -109,13 +109,13 @@ function! edit_archive#archive#Tempname(filename) dict
   return self.tempdir.'/'.a:filename
 endfunction
 
-function! edit_archive#archive#Add(path) dict
+function! archivitor#archive#Add(path) dict
   let cwd = getcwd()
   exe 'cd '.self.tempdir
 
   if a:path =~ '/$'
     if isdirectory(a:path)
-      call edit_archive#System('rm -r '.a:path)
+      call archivitor#System('rm -r '.a:path)
     endif
     call mkdir(a:path, 'p')
   else
@@ -123,7 +123,7 @@ function! edit_archive#archive#Add(path) dict
     if !isdirectory(parent_dir)
       call mkdir(parent_dir, 'p')
     endif
-    call edit_archive#System('touch '.a:path)
+    call archivitor#System('touch '.a:path)
   endif
 
   call self.backend.Add(a:path)
@@ -132,7 +132,7 @@ function! edit_archive#archive#Add(path) dict
   exe 'cd '.cwd
 endfunction
 
-function! edit_archive#archive#Delete(paths) dict
+function! archivitor#archive#Delete(paths) dict
   call self.backend.Delete(a:paths)
   call self.UpdateInfo()
 endfunction
@@ -157,6 +157,6 @@ function! s:Filesize(filename)
   return size
 endfunction
 
-function! edit_archive#archive#UpdateInfo() dict
+function! archivitor#archive#UpdateInfo() dict
   let self.size = s:Filesize(self.name)
 endfunction

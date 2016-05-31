@@ -12,7 +12,7 @@ augroup zip
   autocmd!
 augroup END
 
-augroup edit_archive
+augroup archivitor
   autocmd!
 
   autocmd BufReadCmd *.zip             call s:ReadArchive(expand('<afile>'))
@@ -29,7 +29,7 @@ augroup edit_archive
 augroup END
 
 function! s:ReadArchive(archive)
-  let b:archive = edit_archive#archive#New(a:archive)
+  let b:archive = archivitor#archive#New(a:archive)
   call s:RenderArchiveBuffer()
 
   nnoremap <buffer> <cr>       :call <SID>EditFile('edit')<cr>

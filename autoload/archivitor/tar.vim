@@ -1,48 +1,48 @@
 let s:cached_tempfiles = {}
 
-function! edit_archive#tar#New(name)
+function! archivitor#tar#New(name)
   return {
         \ 'name':     a:name,
         \ 'readonly': 0,
         \
-        \ 'Filelist': function('edit_archive#tar#Filelist'),
-        \ 'Extract':  function('edit_archive#tar#Extract'),
-        \ 'Update':   function('edit_archive#tar#Update'),
-        \ 'Add':      function('edit_archive#tar#Add'),
-        \ 'Delete':   function('edit_archive#tar#Delete'),
+        \ 'Filelist': function('archivitor#tar#Filelist'),
+        \ 'Extract':  function('archivitor#tar#Extract'),
+        \ 'Update':   function('archivitor#tar#Update'),
+        \ 'Add':      function('archivitor#tar#Add'),
+        \ 'Delete':   function('archivitor#tar#Delete'),
         \ }
 endfunction
 
-function! edit_archive#tar#Filelist() dict
+function! archivitor#tar#Filelist() dict
   let file_list = []
-  for line in split(edit_archive#System('tar -tf ' . shellescape(self.name)), "\n")
+  for line in split(archivitor#System('tar -tf ' . shellescape(self.name)), "\n")
     call add(file_list, substitute(line, '\v^\s*\d+\s*\d+-\d+-\d+\s*\d+:\d+\s*(.*)$', '\1', ''))
   endfor
   return sort(file_list)
 endfunction
 
-function! edit_archive#tar#Extract(...) dict
+function! archivitor#tar#Extract(...) dict
   let files = join(a:000, ' ')
-  call edit_archive#System('tar -xf '.shellescape(self.name).' '.files)
+  call archivitor#System('tar -xf '.shellescape(self.name).' '.files)
 endfunction
 
-function! edit_archive#tar#Update(...) dict
+function! archivitor#tar#Update(...) dict
   let files = join(a:000, ' ')
 
   if self.name =~ '\.tar$'
-    call edit_archive#System('tar -rf '.shellescape(self.name).' '.files)
+    call archivitor#System('tar -rf '.shellescape(self.name).' '.files)
     return
   endif
 
   let cached_directory = s:CachedDir(self)
-  call edit_archive#System('cp -r '.files.' '.cached_directory)
+  call archivitor#System('cp -r '.files.' '.cached_directory)
   call s:UpdateFromCachedDir(self)
 endfunction
 
-function! edit_archive#tar#Delete(paths) dict
+function! archivitor#tar#Delete(paths) dict
   if self.name =~ '\.tar$'
     let paths = join(a:paths, ' ')
-    call edit_archive#System('tar --delete -f '.shellescape(self.name).' '.paths)
+    call archivitor#System('tar --delete -f '.shellescape(self.name).' '.paths)
     return
   endif
 
@@ -54,23 +54,23 @@ function! edit_archive#tar#Delete(paths) dict
 
   let paths = join(map(a:paths, 'cached_directory."/".v:val'), ' ')
 
-  call edit_archive#System('rm -r '.paths)
+  call archivitor#System('rm -r '.paths)
   call s:UpdateFromCachedDir(self)
 endfunction
 
-function! edit_archive#tar#Add(path) dict
+function! archivitor#tar#Add(path) dict
   if !filereadable(self.name)
-    call edit_archive#System('tar -caf '.shellescape(self.name).' '.a:path)
+    call archivitor#System('tar -caf '.shellescape(self.name).' '.a:path)
     return
   endif
 
   if self.name =~ '\.tar$'
-    call edit_archive#System('tar -rf '.shellescape(self.name).' '.a:path)
+    call archivitor#System('tar -rf '.shellescape(self.name).' '.a:path)
     return
   endif
 
   let cached_directory = s:CachedDir(self)
-  call edit_archive#System('cp -r '.a:path.' '.cached_directory)
+  call archivitor#System('cp -r '.a:path.' '.cached_directory)
   call s:UpdateFromCachedDir(self)
 endfunction
 
@@ -100,6 +100,6 @@ function! s:UpdateFromCachedDir(archive)
 
   let cwd = getcwd()
   exe 'cd '.directory
-  call edit_archive#System('tar -caf '.a:archive.name.' *')
+  call archivitor#System('tar -caf '.a:archive.name.' *')
   exe 'cd '.cwd
 endfunction
