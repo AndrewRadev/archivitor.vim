@@ -66,6 +66,9 @@ describe "Zip files" do
     vim.feedkeys 'iupdated'
     vim.write
 
+    # force sync
+    vim.command('echo')
+
     system 'unzip fixtures/test.zip'
     expect(File.read('test with spaces.txt').strip).to eq 'updated'
   end
