@@ -22,14 +22,20 @@ function! archivitor#SilentSystem(command, ...)
         " special case, the keys are flags, the values should be escaped
         for [flag, values] in items(args)
           if type(values) != type([])
-            let values = [values]
+            " work around type issues
+            let new_values = [values]
+            unlet values
+            let values = new_values
           endif
           let command .= ' '.flag.' '.join(map(copy(values), 'shellescape(v:val)'), ' ')
           unlet values
         endfor
       else
         if type(args) != type([])
-          let args = [args]
+          " work around type issues
+          let new_args = [args]
+          unlet args
+          let args = new_args
         endif
 
         let command .= ' '.join(map(copy(args), 'shellescape(v:val)'), ' ')
