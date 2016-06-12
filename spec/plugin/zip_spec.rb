@@ -64,8 +64,7 @@ describe "Zip files" do
     vim.search 'test with spaces'
     vim.feedkeys 'gf'
     vim.feedkeys 'iupdated'
-    # force sync
-    vim.command(:echo)
+    sleep 0.5
     vim.write
 
     system 'unzip fixtures/test.zip'
