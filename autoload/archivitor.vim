@@ -25,6 +25,7 @@ function! archivitor#SilentSystem(command, ...)
             let values = [values]
           endif
           let command .= ' '.flag.' '.join(map(copy(values), 'shellescape(v:val)'), ' ')
+          unlet values
         endfor
       else
         if type(args) != type([])
@@ -33,6 +34,8 @@ function! archivitor#SilentSystem(command, ...)
 
         let command .= ' '.join(map(copy(args), 'shellescape(v:val)'), ' ')
       endif
+
+      unlet args
     endfor
   endif
 
