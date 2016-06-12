@@ -15,34 +15,33 @@ endfunction
 
 function! archivitor#tar#Filelist() dict
   let file_list = []
-  for line in split(archivitor#System('tar -tf ' . shellescape(self.name)), "\n")
+  for line in split(archivitor#System('tar -tf', self.name), "\n")
     call add(file_list, substitute(line, '\v^\s*\d+\s*\d+-\d+-\d+\s*\d+:\d+\s*(.*)$', '\1', ''))
   endfor
   return sort(file_list)
 endfunction
 
 function! archivitor#tar#Extract(...) dict
-  let files = join(a:000, ' ')
-  call archivitor#System('tar -xf '.shellescape(self.name).' '.files)
+  call archivitor#System('tar -xf', self.name, a:000)
 endfunction
 
 function! archivitor#tar#Update(...) dict
-  let files = join(a:000, ' ')
+  let files = a:000
 
   if self.name =~ '\.tar$'
-    call archivitor#System('tar -rf '.shellescape(self.name).' '.files)
+    call archivitor#System('tar -rf', self.name, files)
     return
   endif
 
   let cached_directory = s:CachedDir(self)
-  call archivitor#System('cp -r '.files.' '.cached_directory)
+  call archivitor#System('cp -r', files, cached_directory)
   call s:UpdateFromCachedDir(self)
 endfunction
 
 function! archivitor#tar#Delete(paths) dict
   if self.name =~ '\.tar$'
     let paths = join(a:paths, ' ')
-    call archivitor#System('tar --delete -f '.shellescape(self.name).' '.paths)
+    call archivitor#System('tar --delete -f', self.name, paths)
     return
   endif
 
@@ -54,23 +53,23 @@ function! archivitor#tar#Delete(paths) dict
 
   let paths = join(map(a:paths, 'cached_directory."/".v:val'), ' ')
 
-  call archivitor#System('rm -r '.paths)
+  call archivitor#System('rm -r', paths)
   call s:UpdateFromCachedDir(self)
 endfunction
 
 function! archivitor#tar#Add(path) dict
   if !filereadable(self.name)
-    call archivitor#System('tar -caf '.shellescape(self.name).' '.a:path)
+    call archivitor#System('tar -caf', self.name, a:path)
     return
   endif
 
   if self.name =~ '\.tar$'
-    call archivitor#System('tar -rf '.shellescape(self.name).' '.a:path)
+    call archivitor#System('tar -rf', self.name, a:path)
     return
   endif
 
   let cached_directory = s:CachedDir(self)
-  call archivitor#System('cp -r '.a:path.' '.cached_directory)
+  call archivitor#System('cp -r', a:path, cached_directory)
   call s:UpdateFromCachedDir(self)
 endfunction
 
@@ -100,6 +99,6 @@ function! s:UpdateFromCachedDir(archive)
 
   let cwd = getcwd()
   exe 'cd '.directory
-  call archivitor#System('tar -caf '.a:archive.name.' *')
+  call archivitor#System('tar -caf '.shellescape(a:archive.name).' *')
   exe 'cd '.cwd
 endfunction

@@ -53,4 +53,20 @@ describe "Zip files" do
       File.exists?('new_archive.zip')
     }.from(false).to(true)
   end
+
+  it "can operate on files with spaces" do
+    vim.edit 'fixtures/test.zip'
+
+    vim.search 'test.txt'
+    vim.normal 'otest with spaces.txt'
+    vim.write
+
+    vim.search 'test with spaces'
+    vim.feedkeys 'gf'
+    vim.feedkeys 'iupdated'
+    vim.write
+
+    system 'unzip fixtures/test.zip'
+    expect(File.read('test with spaces.txt').strip).to eq 'updated'
+  end
 end

@@ -12,7 +12,7 @@ function! archivitor#rar#New(name)
 endfunction
 
 function! archivitor#rar#Filelist() dict
-  let initial_file_list = sort(split(archivitor#System('unrar vb ' . shellescape(self.name)), "\n"))
+  let initial_file_list = sort(split(archivitor#System('unrar vb', self.name), "\n"))
 
   let files       = []
   let directories = []
@@ -39,8 +39,7 @@ function! archivitor#rar#Filelist() dict
 endfunction
 
 function! archivitor#rar#Extract(...) dict
-  let files = join(a:000, ' ')
-  call archivitor#System('unrar x '.shellescape(self.name).' '.files)
+  call archivitor#System('unrar x', self.name, a:000)
 endfunction
 
 function! archivitor#rar#Update(...) dict

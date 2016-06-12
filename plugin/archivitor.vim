@@ -46,7 +46,7 @@ function! s:EditFile(operation)
   let filename = s:FilenameOnLine()
   let tempname = archive.Tempname(filename)
 
-  exe a:operation.' '.tempname
+  exe a:operation.' '.escape(tempname, ' ')
   let b:archive = archive
   call b:archive.SetupWriteBehaviour(filename)
   command! -buffer Archive call b:archive.GotoBuffer() | call s:RenderArchiveBuffer()
@@ -65,11 +65,12 @@ function! s:UpdateArchive()
   if first_line
     " then we have lines we need to parse
     for line in getline(first_line, line('$'))
-      if line =~ '^\d\+.'
+      if line =~ '^\s*\d\+.'
         " then it's an existing entry
-        let index         = str2nr(matchstr(line, '^\d\+\ze.'))
-        let path          = strpart(line, strlen(index) + 2)
-        let original_path = files[index]
+        let index_as_string = matchstr(line, '^\s*\d\+\ze.')
+        let index           = str2nr(index_as_string)
+        let path            = strpart(line, strlen(index_as_string) + 2)
+        let original_path   = files[index]
         call remove(remaining_indices, index(remaining_indices, index))
 
         if original_path != path

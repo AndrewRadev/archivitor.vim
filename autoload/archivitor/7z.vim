@@ -16,7 +16,7 @@ function! archivitor#7z#Filelist() dict
   let files_started = 0
   let filename_column = -1
 
-  for line in split(archivitor#SilentSystem('7z l ' . shellescape(self.name)), "\n")
+  for line in split(archivitor#SilentSystem('7z l', self.name), "\n")
     if line =~ '\s*Date\s*Time\s*Attr\s*Size\s*Compressed\s*Name'
       " the header, figure out where the files are
       let filename_column = stridx(line, 'Name')
@@ -46,21 +46,17 @@ function! archivitor#7z#Filelist() dict
 endfunction
 
 function! archivitor#7z#Extract(...) dict
-  let paths = copy(a:000)
-  let files = join(map(paths, 'shellescape(v:val)'), ' ')
-  call archivitor#System('7z x '.shellescape(self.name).' '.files)
+  call archivitor#System('7z x', self.name, a:000)
 endfunction
 
 function! archivitor#7z#Update(...) dict
-  let files = join(a:000, ' ')
-  call archivitor#System('7z u '.shellescape(self.name).' '.files)
+  call archivitor#System('7z u', self.name, a:000)
 endfunction
 
 function! archivitor#7z#Delete(paths) dict
-  let files = join(a:paths, ' ')
-  call archivitor#System('7z d '.shellescape(self.name).' '.files)
+  call archivitor#System('7z d', self.name, a:paths)
 endfunction
 
 function! archivitor#7z#Add(path) dict
-  call archivitor#System('7z a '.shellescape(self.name).' '.shellescape(a:path))
+  call archivitor#System('7z a', self.name, a:path)
 endfunction
