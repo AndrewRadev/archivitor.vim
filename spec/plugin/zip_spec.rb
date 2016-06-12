@@ -64,10 +64,9 @@ describe "Zip files" do
     vim.search 'test with spaces'
     vim.feedkeys 'gf'
     vim.feedkeys 'iupdated'
-    vim.write
-
     # force sync
-    vim.command('echo')
+    vim.command(:echo)
+    vim.write
 
     system 'unzip fixtures/test.zip'
     expect(File.read('test with spaces.txt').strip).to eq 'updated'
