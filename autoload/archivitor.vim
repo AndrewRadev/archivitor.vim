@@ -1,69 +1,98 @@
-function! archivitor#System(command, ...)
-  let args = [a:command]
-  call extend(args, a:000)
+function! archivitor#EditFile(operation)
+  let archive  = b:archive
+  let filename = archivitor#FilenameOnLine()
+  let tempname = archive.Tempname(filename)
 
-  let result = call('archivitor#SilentSystem', args)
-
-  if v:shell_error
-    echomsg "System error: Command: ".result
-    echoerr "System error: Result:  ".result
-  endif
-
-  return result
+  exe a:operation.' '.escape(tempname, ' ')
+  let b:archive = archive
+  call b:archive.SetupWriteBehaviour(filename)
+  command! -buffer Archive call b:archive.GotoBuffer() | call archivitor#RenderArchiveBuffer()
 endfunction
 
-function! archivitor#SilentSystem(command, ...)
-  let command = a:command
+function! archivitor#UpdateArchive()
+  let saved_cursor = getpos('.')
 
-  if a:0 > 0
-    " there are arguments, prepare them for the shell
-    for args in a:000
-      if type(args) == type({})
-        " special case, the keys are flags, the values should be escaped
-        for [flag, values] in items(args)
-          if type(values) != type([])
-            " work around type issues
-            let new_values = [values]
-            unlet values
-            let values = new_values
-          endif
-          let command .= ' '.flag.' '.join(map(copy(values), 'shellescape(v:val)'), ' ')
-          unlet values
-        endfor
-      else
-        if type(args) != type([])
-          " work around type issues
-          let new_args = [args]
-          unlet args
-          let args = new_args
+  let files             = b:archive.Filelist()
+  let remaining_indices = range(len(files))
+
+  call cursor(1, 1)
+  call search('=====', 'W')
+  let first_line = nextnonblank(line('.') + 1)
+
+  if first_line
+    " then we have lines we need to parse
+    for line in getline(first_line, line('$'))
+      if line =~ '^\s*\d\+.'
+        " then it's an existing entry
+        let index_as_string = matchstr(line, '^\s*\d\+\ze.')
+        let index           = str2nr(index_as_string)
+        let path            = strpart(line, strlen(index_as_string) + 2)
+        let original_path   = files[index]
+        call remove(remaining_indices, index(remaining_indices, index))
+
+        if original_path != path
+          call b:archive.Rename(original_path, path)
         endif
-
-        let command .= ' '.join(map(copy(args), 'shellescape(v:val)'), ' ')
+      else
+        " it's a new entry
+        call b:archive.Add(line)
       endif
-
-      unlet args
     endfor
+  else
+    " no lines, everything has been deleted, it seems
+    call setpos('.', saved_cursor)
   endif
 
-  return system(command)
+  let missing_files = map(remaining_indices, 'files[v:val]')
+  if len(missing_files) > 0
+    call b:archive.Delete(missing_files)
+  endif
+
+  call archivitor#RenderArchiveBuffer()
+
+  call setpos('.', saved_cursor)
 endfunction
 
-function! archivitor#Group(list, batch_size)
-  let batches = []
-  let current_batch = []
+function! archivitor#Enumerate(file_list)
+  let file_count      = len(a:file_list)
+  let width           = strlen(file_count - 1)
+  let enumerated_list = []
 
-  for item in a:list
-    if len(current_batch) == a:batch_size
-      call add(batches, current_batch)
-      let current_batch = []
-    endif
-
-    call add(current_batch, item)
+  for i in range(file_count)
+    call add(enumerated_list, printf('%'.width.'s. ', i).remove(a:file_list, 0))
   endfor
 
-  if len(current_batch) > 0
-    call add(batches, current_batch)
+  return enumerated_list
+endfunction
+
+function! archivitor#RenderArchiveBuffer()
+  %delete _
+
+  let banner = []
+  call add(banner, 'File:   ' . b:archive.name)
+  call add(banner, 'Format: ' . b:archive.format)
+  call add(banner, 'Size:   ' . b:archive.size)
+  call add(banner, repeat('=', len(banner[0])))
+  call append(0, banner)
+
+  let contents = archivitor#Enumerate(b:archive.Filelist())
+  set filetype=archive
+  setlocal buftype=acwrite
+  setlocal bufhidden=hide
+  setlocal isfname+=:
+  call append(line('$'), contents)
+  normal! gg
+  set nomodified
+  let b:skip_clean_whitepaste = 1
+endfunction
+
+function! archivitor#FilenameOnLine()
+  let line = getline('.')
+  let line_number_pattern = '^\s*\d\+\. '
+
+  if line !~ line_number_pattern
+    return ''
   endif
 
-  return batches
+  return substitute(line, line_number_pattern, '', '')
 endfunction

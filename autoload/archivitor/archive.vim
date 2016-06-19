@@ -115,7 +115,7 @@ function! archivitor#archive#Add(path) dict
 
   if a:path =~ '/$'
     if isdirectory(a:path)
-      call archivitor#System('rm -r', a:path)
+      call archivitor#util#System('rm -r', a:path)
     endif
     call mkdir(a:path, 'p')
   else
@@ -123,7 +123,7 @@ function! archivitor#archive#Add(path) dict
     if !isdirectory(parent_dir)
       call mkdir(parent_dir, 'p')
     endif
-    call archivitor#System('touch', a:path)
+    call archivitor#util#System('touch', a:path)
   endif
 
   call self.backend.Add(a:path)
@@ -133,7 +133,7 @@ function! archivitor#archive#Add(path) dict
 endfunction
 
 function! archivitor#archive#Delete(paths) dict
-  for path_batch in archivitor#Group(a:paths, 100)
+  for path_batch in archivitor#util#Group(a:paths, 100)
     call self.backend.Delete(path_batch)
   endfor
   call self.UpdateInfo()
