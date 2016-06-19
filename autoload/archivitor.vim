@@ -1,6 +1,6 @@
 function! archivitor#EditFile(operation)
   let archive  = b:archive
-  let filename = archivitor#FilenameOnLine()
+  let filename = s:FilenameOnLine()
   let tempname = archive.Tempname(filename)
 
   exe a:operation.' '.escape(tempname, ' ')
@@ -86,7 +86,18 @@ function! archivitor#RenderArchiveBuffer()
   let b:skip_clean_whitepaste = 1
 endfunction
 
-function! archivitor#FilenameOnLine()
+function! archivitor#ExternalOpenFile()
+  let filename = s:FilenameOnLine()
+  let real_path = b:archive.Tempname(filename)
+
+  if exists('*OpenURL')
+    call OpenURL(real_path)
+  else
+    call netrw#BrowseX(real_path, 0)
+  endif
+endfunction
+
+function! s:FilenameOnLine()
   let line = getline('.')
   let line_number_pattern = '^\s*\d\+\. '
 

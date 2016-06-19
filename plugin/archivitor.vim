@@ -38,5 +38,8 @@ function! archivitor#ReadArchive(archive)
   nnoremap <buffer> <c-w><c-f> :call archivitor#EditFile('split')<cr>
   nnoremap <buffer> <c-w>gf    :call archivitor#EditFile('tabedit')<cr>
 
+  " TODO (2016-06-19) A way to override mappings
+  nnoremap gx :call archivitor#ExternalOpenFile()<cr>
+
   command! -buffer -nargs=1 -complete=dir Extract call b:archive.ExtractAll(<f-args>)
 endfunction
