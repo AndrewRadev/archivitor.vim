@@ -1,1 +1,57 @@
+*archivitor.txt*	TODO
+
+==============================================================================
+CONTENTS                                        *archivitor*   *archivitor-contents*
+
+    Installation................................: |archivitor-installation|
+    Usage.......................................: |archivitor-usage|
+    Settings....................................: |archivitor-settings|
+    Internals...................................: |archivitor-internals|
+    Issues......................................: |archivitor-issues|
+
+
+==============================================================================
+INSTALLATION                                            *archivitor-installation*
+
+There are several ways to install the plugin. The recommended one is by using
+Tim Pope's pathogen (http://www.vim.org/scripts/script.php?script_id=2332). In
+that case, you can clone the plugin's git repository like so:
+>
+    git clone git://github.com/AndrewRadev/archivitor.vim.git ~/.vim/bundle/archivitor
+<
+If your vim configuration is under git version control, you could also set up
+the repository as a submodule, which would allow you to update more easily.
+The command is (provided you're in ~/.vim):
+>
+    git submodule add git://github.com/AndrewRadev/archivitor.vim.git bundle/archivitor
+<
+
+Another way is to simply copy all the essential directories inside the ~/.vim
+directory: TODO list of directories
+
+
+==============================================================================
+USAGE                                                          *archivitor-usage*
+
 TODO
+
+
+==============================================================================
+SETTINGS                                                    *archivitor-settings*
+
+TODO
+
+
+==============================================================================
+INTERNALS                                                  *archivitor-internals*
+
+TODO
+
+==============================================================================
+ISSUES                                                        *archivitor-issues*
+
+Any issues and suggestions are very welcome on the github bugtracker:
+https://github.com/AndrewRadev/archivitor.vim/issues
+
+
+vim:tw=78:sw=4:ft=help:norl:
